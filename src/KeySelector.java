@@ -4,7 +4,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import id.co.kodekreatif.pdfvalidator.*;
+import id.co.kodekreatif.pdfdigisign.*;
 
 import java.security.cert.*;
 
@@ -81,7 +81,7 @@ public class KeySelector extends CordovaPlugin implements KeyChainAliasCallback 
             certInfo.verified = true;
           } catch (Exception e) {
             certInfo.verified = false;
-            certInfo.verificationFailure = e.getMessage();
+            certInfo.problems.add(e.getMessage());
             ok = false;
           }
 
@@ -90,12 +90,14 @@ public class KeySelector extends CordovaPlugin implements KeyChainAliasCallback 
 
           try {
             x509.checkValidity();
-            certInfo.state = "valid";
+            certInfo.valid = true;
           } catch (CertificateExpiredException e) {
-            certInfo.state = "expired";
+            certInfo.valid = false;
+            certInfo.problems.add("expired");
             ok = false;
           } catch (CertificateNotYetValidException e) {
-            certInfo.state = "notYet";
+            certInfo.valid = false;
+            certInfo.problems.add("not-yet-valid");
             ok = false;
           }
           certs.add(certInfo);
